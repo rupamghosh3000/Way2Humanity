@@ -1,0 +1,38 @@
+body { 
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        scroll-behavior: smooth; 
+}
+        
+.nav-link { 
+        position: relative; 
+        transition: color 0.3s; 
+}
+        
+.nav-link::after { 
+        content: ''; 
+        position: absolute; 
+        width: 0; 
+        height: 2px; 
+        bottom: -4px; 
+        left: 0; 
+        background: #10b981; 
+        transition: width 0.3s; 
+}
+        
+.nav-link:hover::after { 
+        width: 100%; 
+}
+        
+.ai-gradient { 
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); 
+}
+        
+.glass-card { 
+        background: rgba(255, 255, 255, 0.8); 
+        backdrop-filter: blur(12px); 
+        border: 1px solid rgba(226, 232, 240, 0.8); 
+}
+        
+.animate-pulse-slow { 
+        animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite; 
+}
