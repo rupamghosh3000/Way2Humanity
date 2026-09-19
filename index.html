@@ -216,11 +216,11 @@
         </div>
     </footer>
 
-    <script
+    <script>
         lucide.createIcons();
 
         function route(id) {
-            const views = ['home-view', 'seeker-view', 'helper-view', 'fund-view', 'home-stats']
+            const views = ['home-view', 'seeker-view', 'helper-view', 'fund-view', 'home-stats'];
             views.forEach(v => {
                 const el = document.getElementById(v);
                 if(el) el.classList.add('hidden');
