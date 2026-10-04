@@ -7,7 +7,8 @@ export interface IVerificationSignal {
   detail: string;
 }
 
-export interface IVerificationResult extends Document {
+export interface IVerificationResult {
+  _id?: mongoose.Types.ObjectId;
   missionId: mongoose.Types.ObjectId;
   evidenceIds: mongoose.Types.ObjectId[];
   provider: string;
