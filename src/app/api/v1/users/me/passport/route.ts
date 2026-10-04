@@ -15,23 +15,27 @@ export async function GET(req: NextRequest) {
       return auth.errorResponse!;
     }
 
+    const currentUser = auth.user;
+    const currentUserId = currentUser.id;
+    const currentUserEmail = currentUser.email;
+
     const db = await connectToDatabase();
 
     // -------------------------------------------------------------
     // In-Memory Mode or MongoDB Offline
     // -------------------------------------------------------------
     if (!db) {
-      let memUser = memoryStore.users.get(auth.user.email);
+      let memUser = memoryStore.users.get(currentUserEmail);
       if (!memUser) {
         for (const u of memoryStore.users.values()) {
-          if (u._id === auth.user.id || u.email === auth.user.email) {
+          if (u._id === currentUserId || u.email === currentUserEmail) {
             memUser = u;
             break;
           }
         }
       }
 
-      const userId = memUser?._id || auth.user.id;
+      const userId = memUser?._id || currentUserId;
       const repSummary = memUser?.reputationSummary || {
         points: 0,
         missionsCompleted: 0,
@@ -41,7 +45,7 @@ export async function GET(req: NextRequest) {
 
       // Retrieve verified reputation events
       let userRepEvents = memoryStore.auditEvents
-        .filter((e) => (e.actorId === userId || e.targetId === userId || e.actorId === auth.user.id || e.targetId === auth.user.id) && e.action === 'REPUTATION_AWARDED')
+        .filter((e) => (e.actorId === userId || e.targetId === userId || e.actorId === currentUserId || e.targetId === currentUserId) && e.action === 'REPUTATION_AWARDED')
         .map((e) => ({
           _id: e._id,
           reason: (e.metadata?.reason as string) || 'Verified community contribution',
@@ -51,7 +55,7 @@ export async function GET(req: NextRequest) {
 
       // Retrieve completed missions
       const completedMissions = Array.from(memoryStore.missions.values())
-        .filter((m) => (m.assignedHelperId === userId || m.assignedHelperId === auth.user.id) && m.status === 'COMPLETED')
+        .filter((m) => (m.assignedHelperId === userId || m.assignedHelperId === currentUserId) && m.status === 'COMPLETED')
         .map((m) => ({
           _id: m._id,
           title: m.title,
@@ -86,7 +90,7 @@ export async function GET(req: NextRequest) {
       else if (points >= 100) badge = 'VERIFIED_HUMANITARIAN';
       else if (points >= 30) badge = 'COMMUNITY_HELPER';
 
-      const passportRaw = `${userId}:${auth.user.email}:${points}`;
+      const passportRaw = `${userId}:${currentUserEmail}:${points}`;
       const passportHash = crypto.createHash('sha256').update(passportRaw).digest('hex');
 
       return NextResponse.json({
@@ -95,9 +99,9 @@ export async function GET(req: NextRequest) {
           passport: {
             userId,
             passportId: `W2H-IND-${userId.replace(/[^a-zA-Z0-9]/g, '').slice(-6).toUpperCase()}`,
-            name: memUser?.name || auth.user.name,
-            email: auth.user.email,
-            roles: memUser?.roles || auth.user.roles || ['HELPER'],
+            name: memUser?.name || currentUser.name,
+            email: currentUserEmail,
+            roles: memUser?.roles || currentUser.roles || ['HELPER'],
             city: memUser?.city || 'Mumbai',
             region: memUser?.region || 'Maharashtra',
             skills: (memUser as any)?.skills || ['Food Distribution', 'Community Outreach', 'Logistics'],
@@ -116,7 +120,7 @@ export async function GET(req: NextRequest) {
     // -------------------------------------------------------------
     // MongoDB Mode
     // -------------------------------------------------------------
-    const user = await User.findById(auth.user.id).select('-passwordHash');
+    const user = await User.findById(currentUserId).select('-passwordHash');
     if (!user) {
       return NextResponse.json({ success: false, error: { message: 'User not found' } }, { status: 404 });
     }
