@@ -152,7 +152,7 @@ export async function POST(
 
     // Run REAL Proof AI Verification (comparing original evidence vs proof evidence)
     const initialEvidence = await Evidence.findOne({ missionId: mission._id }).sort({ createdAt: 1 });
-    const originalUrl = initialEvidence?.url || mission.evidenceUrls?.[0] || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800';
+    const originalUrl = initialEvidence?.url || (mission as any).evidenceUrls?.[0] || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800';
 
     const proofAiAnalysis = await analyzeProofWithAI({
       originalEvidenceUrlOrBuffer: originalUrl,
