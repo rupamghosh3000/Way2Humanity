@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: way2humanity
+    runtime: node
+    plan: starter
+    region: singapore # or oregon / frankfurt
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_URL
+        sync: false
+      - key: API_URL
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: AI_PROVIDER
+        value: gemini
+      - key: AI_PROVIDER_API_KEY
+        sync: false
+      - key: PAYMENT_PROVIDER
+        value: razorpay
+      - key: PAYMENT_KEY_ID
+        sync: false
+      - key: PAYMENT_KEY_SECRET
+        sync: false
+      - key: PAYMENT_WEBHOOK_SECRET
+        sync: false
+      - key: STORAGE_PROVIDER
+        value: local # change to s3 for persistent cloud storage
